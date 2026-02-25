@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-app
+  namespace: default
+  labels:
+    app: posts-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts-app
+  template:
+    metadata:
+      labels:
+        app: posts-app
+    spec:
+      containers:
+        - name: posts-app
+          image: posts-app:v1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          env:
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://postgres:postgres@posts-db-service:5432/posts_db"
+          readinessProbe:
+            httpGet:
+              path: /posts/ping
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /posts/ping
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10

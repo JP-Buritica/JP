@@ -1,0 +1,41 @@
+<h1 id="vista-de-desarrollo">Vista de Desarrollo</h1>
+
+<p>Esta sección describe los estándares técnicos y procesos de colaboración del equipo.</p>
+
+<h2 id="branching-strategy">Branching Strategy</h2>
+<p>Utilizamos <strong>GitHub Flow</strong>:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">main</code>: Rama protegida que contiene código estable y listo para despliegue.</li>
+  <li><code class="language-plaintext highlighter-rouge">feat/</code>, <code class="language-plaintext highlighter-rouge">fix/</code>, <code class="language-plaintext highlighter-rouge">docs/</code>, <code class="language-plaintext highlighter-rouge">chore/</code>: Ramas para desarrollo de funcionalidades, correcciones o documentación.</li>
+  <li>Todos los cambios se integran mediante <strong>Pull Requests</strong> hacia <code class="language-plaintext highlighter-rouge">main</code>.</li>
+</ul>
+
+<h2 id="code-review-requirements">Code Review Requirements</h2>
+<ul>
+  <li>Al menos <strong>1 aprobación</strong> de un par antes de integrar a <code class="language-plaintext highlighter-rouge">main</code>.</li>
+  <li>Superar todos los checks de los pipelines de CI (Documentation, Unit Tests, K8s).</li>
+  <li>Comentarios constructivos y resolución de hilos de discusión.</li>
+</ul>
+
+<h2 id="commit-message-conventions">Commit Message Conventions</h2>
+<p>Seguimos el estándar de <strong>Conventional Commits</strong>:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">feat</code>: Nueva funcionalidad.</li>
+  <li><code class="language-plaintext highlighter-rouge">fix</code>: Corrección de errores.</li>
+  <li><code class="language-plaintext highlighter-rouge">docs</code>: Cambios en la documentación.</li>
+  <li><code class="language-plaintext highlighter-rouge">chore</code>: Tareas de mantenimiento o configuración.</li>
+  <li><code class="language-plaintext highlighter-rouge">ci</code>: Cambios en archivos de configuración de pipelines.</li>
+  <li><code class="language-plaintext highlighter-rouge">refactor</code>: Cambios en el código que no corrigen errores ni añaden funcionalidades.</li>
+</ul>
+
+<h2 id="definition-of-done-dod">Definition of Done (DoD)</h2>
+<p>Una tarea se considera finalizada cuando:</p>
+<ol>
+  <li>El código cumple con las guías de estilo (Linting).</li>
+  <li>Se han implementado pruebas unitarias con una cobertura &gt;= 70%.</li>
+  <li>La documentación técnica ha sido actualizada (<code class="language-plaintext highlighter-rouge">/docs</code>).</li>
+  <li>Los manifiestos de Kubernetes han sido actualizados (<code class="language-plaintext highlighter-rouge">/k8s</code>).</li>
+  <li>El Pull Request ha sido aprobado y mergeado.</li>
+</ol>
+
+<p><img src="./diagrams/components.png" alt="Vista de desarrollo" title="Vista de desarrollo" /></p>

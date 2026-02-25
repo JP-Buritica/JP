@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: routes-app
+  namespace: default
+  labels:
+    app: routes-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routes-app
+  template:
+    metadata:
+      labels:
+        app: routes-app
+    spec:
+      containers:
+        - name: routes-app
+          image: routes-app:v1.0.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          env:
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://postgres:postgres@routes-db-service:5432/routes_db"
+          readinessProbe:
+            httpGet:
+              path: /routes/ping
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /routes/ping
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
