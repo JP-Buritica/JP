@@ -17,6 +17,7 @@ psycopg2-binary = "^2.9.11"
 pydantic = "^2.12.5"
 asyncpg = "^0.31.0"
 aiosqlite = "^0.22.1"
+httpx = "^0.28.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

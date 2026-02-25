@@ -120,3 +120,59 @@ async def test_get_post_invalid_uuid(client):
     response = await client.get("/posts/invalid-uuid-12345")
     assert response.status_code == 400
     assert "detail" in response.json()
+
+@pytest.mark.asyncio
+async def test_create_post_user_or_route_not_found(client):
+    from app.main import app
+    from app.routers.posts import get_validator
+
+    class MissingValidator:
+        async def user_exists(self, user_id: str) -> bool:
+            return False
+
+        async def route_exists(self, route_id: str) -> bool:
+            return True
+
+    app.dependency_overrides[get_validator] = lambda: MissingValidator()
+
+    payload = {
+        "userId": str(uuid.uuid4()),
+        "routeId": str(uuid.uuid4()),
+        "expireAt": (datetime.now(timezone.utc) + timedelta(days=2)).isoformat()
+    }
+
+    response = await client.post("/posts", json=payload)
+    assert response.status_code == 412
+
+
+@pytest.mark.asyncio
+async def test_create_post_external_dependency_unavailable(client):
+    from app.main import app
+    from app.routers.posts import get_validator
+    from app.integrations import IntegrationError
+
+    class FailingValidator:
+        async def user_exists(self, user_id: str) -> bool:
+            raise IntegrationError("Users service unavailable")
+
+        async def route_exists(self, route_id: str) -> bool:
+            return True
+
+    app.dependency_overrides[get_validator] = lambda: FailingValidator()
+
+    payload = {
+        "userId": str(uuid.uuid4()),
+        "routeId": str(uuid.uuid4()),
+        "expireAt": (datetime.now(timezone.utc) + timedelta(days=2)).isoformat()
+    }
+
+    response = await client.post("/posts", json=payload)
+    assert response.status_code == 503
+
+
+
+def test_external_service_default_urls():
+    from app.config import settings
+
+    assert settings.users_service_url == "http://users-app-service:3000"
+    assert settings.routes_service_url == "http://routes-app-service:8000"
