@@ -16,6 +16,7 @@ from app.schemas import (
 from app.services.posts_service import PostsService
 from app.repositories.posts_repository import PostsRepository
 from app.models import Post
+from app.integrations import IntegrationError, UsersRoutesValidator
 
 # Router para los endpoints relacionados con posts
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -24,6 +25,10 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 async def get_service(db: AsyncSession = Depends(get_db)) -> PostsService:
     repository = PostsRepository(db)
     return PostsService(repository)
+
+
+def get_validator() -> UsersRoutesValidator:
+    return UsersRoutesValidator()
 
 # Endpoint simple para verificar que el servicio está activo
 @router.get("/ping")
@@ -35,6 +40,7 @@ async def ping():
 async def create_post(
     post: PostCreate,
     service: PostsService = Depends(get_service),
+    validator: UsersRoutesValidator = Depends(get_validator),
 ):
     # Asegura que expireAt tenga timezone
     expire_at_aware = post.expireAt
@@ -56,6 +62,15 @@ async def create_post(
             UUID(value)
         except ValueError:
             raise HTTPException(status_code=400)
+
+    try:
+        user_exists = await validator.user_exists(post.userId)
+        route_exists = await validator.route_exists(post.routeId)
+    except IntegrationError:
+        return JSONResponse(status_code=503, content={"msg": "No fue posible validar datos externos"})
+
+    if not user_exists or not route_exists:
+        return JSONResponse(status_code=412, content={"msg": "El usuario o la ruta no existen"})
 
     # Crear objeto de dominio para el post
     domain_post = Post(

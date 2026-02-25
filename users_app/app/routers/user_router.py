@@ -52,6 +52,12 @@ def login(credentials: UserLogin, service: UserService = Depends(get_user_servic
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+
+# Obtener usuario por id
+@router.get("/{id}", response_model=UserResponse)
+def get_user_by_id(id: str, service: UserService = Depends(get_user_service)):
+    return service.get_user_by_id(id)
+
 # Actualizar un usuario
 @router.patch("/{id}")
 def update_user(id: str, user_update: UserUpdate, service: UserService = Depends(get_user_service)):

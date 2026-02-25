@@ -80,3 +80,17 @@ def test_reset(test_client, sample_user):
     assert response.status_code == 200
     count_response = test_client.get("/users/count")
     assert count_response.json()["count"] == 0
+
+
+# Test obtener usuario por id
+def test_get_user_by_id_success(test_client, sample_user):
+    response = test_client.get(f"/users/{sample_user.id}")
+    assert response.status_code == 200
+    assert response.json()["id"] == sample_user.id
+
+
+# Test obtener usuario por id inexistente
+def test_get_user_by_id_not_found(test_client):
+    response = test_client.get("/users/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"

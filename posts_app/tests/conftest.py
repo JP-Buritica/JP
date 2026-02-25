@@ -7,6 +7,7 @@ from httpx import AsyncClient, ASGITransport
 
 from app import database
 from app.main import app
+from app.routers.posts import get_validator
 
 # URL de base de datos de prueba en memoria
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -47,6 +48,14 @@ async def async_session(engine):
         yield session
 
 # Fixture para proporcionar un cliente HTTP asíncrono para probar los endpoints de FastAPI
+class _ValidatorStub:
+    async def user_exists(self, user_id: str) -> bool:
+        return True
+
+    async def route_exists(self, route_id: str) -> bool:
+        return True
+
+
 @pytest_asyncio.fixture(scope="function")
 async def client(async_session):
     # Sobrescribir la dependencia get_db para usar la sesión de prueba
@@ -54,6 +63,7 @@ async def client(async_session):
         yield async_session
 
     app.dependency_overrides[database.get_db] = override_get_db
+    app.dependency_overrides[get_validator] = lambda: _ValidatorStub()
 
     # Crear cliente HTTP para realizar requests a la app en memoria
     async with AsyncClient(

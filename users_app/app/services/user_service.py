@@ -69,6 +69,13 @@ class UserService:
                  
         return self.repository.update(user, update_data)
     
+
+    def get_user_by_id(self, id: str):
+        user = self.repository.get_by_id(id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+
     # Contar usuarios
     def get_count(self):
         return self.repository.count()

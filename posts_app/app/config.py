@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://user:password@localhost:5432/posts_db"  # URL de conexión a la base de datos
     app_name: str = "Posts App"  # Nombre de la aplicación
     app_version: str = "1.0.0"   # Versión de la aplicación
+    users_service_url: str = "http://users-app-service:3000"
+    routes_service_url: str = "http://routes-app-service:8000"
+    external_request_timeout: float = 5.0
 
     # Configuración de Pydantic para leer variables desde un archivo .env
     model_config = ConfigDict(
